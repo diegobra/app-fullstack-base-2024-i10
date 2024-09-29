@@ -1,94 +1,82 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="./static/css/materialize.min.css" media="screen,projection"/>
-    <link type="text/css" rel="stylesheet" href="./static/css/styles.css" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="./static/css/materialize.min.css" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="./static/css/styles.css" media="screen,projection" />
     <script type="text/javascript" src="./static/js/materialize.min.js"></script>
-    <script src="js/user.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  </head>
-  <body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
 
     <main>
-      <!-- Navigation bar -->
-      <nav style="background-color:#124580">
-        <div id="xx" class="nav-wrapper">
-          <a href="#!" class="brand-logo left" style="margin-left: 15px;">Smart Home</a>
-          <ul id="nav-mobile" class="right" style="margin-right: 15px;">
-            <li><a href="#">Help</a></li>
-          </ul>
-        </div>
-      </nav>
-
-      <!-- Page Body -->
-      <div class="container">
-        <br/>
-        <h1 id="tit">Administración de Dispositivos</h1>
-        <h3>Smart Home Web</h3>
-        <br/>
-
-        <div class="row">
-          <div class="col s12 m12 l6 xl6">
-            <ul id="list" class="collection">
-              <!-- Aquí se llenará dinámicamente la lista de dispositivos -->
-            </ul>
-          </div>
-
-          <!-- Panel lateral para editar dispositivos -->
-          <div class="col s12 m12 l6 xl6" id="editPanel" style="display: none;">
-            <h4 id="deviceEditorTitle"></h4>
-            <div class="row">
-              <div class="input-field col s12">
-                <input id="editName" type="text" class="validate">
-                <label id="editNameLabel" for="editName">Nombre del Dispositivo</label>
-              </div>
-              <div class="input-field col s12">
-                <input id="editDescription" type="text" class="validate">
-                <label id="editDescriptionLabel" for="editDescription">Descripción del Dispositivo</label>
-              </div>
-              <div class="input-field col s12">
-                <input id="editType" type="text" class="validate">
-                <label id="editTypeLabel" for="editType">Tipo de Dispositivo</label>
-              </div>
-              <div class="input-field col s12">
-                <input id="editState" type="number" min="0" max="1" step="0.1">
-                <label id="editStateLabel" for="editState">Estado (0 - 1)</label>
-              </div>
-              <button id="saveDevice" class="btn waves-effect waves-light" type="button">Guardar</button>
+        <!-- Navigation bar -->
+        <nav style="background-color:#124580">
+            <div id="xx" class="nav-wrapper">
+                <a href="#!" class="brand-logo left" style="margin-left: 15px;">Smart Home</a>
             </div>
-          </div>
-        </div>
+        </nav>
 
-        <div class="row">
-          <div class="col s12 m12 l12 xl12">
-            <button id="btnBuscar" class="btn waves-effect waves-light button-view" name="hello_button">Buscar</button>
-            <button id="btnAddDevice" title="Agregar dispositivo" class="btn waves-effect waves-light button-view" name="hello_button">Agregar</button>
-          </div>
+        <!-- Page Body -->
+        <div class="container">
+            <br />
+            <br />
+
+            <div class="row">
+                <div id="actionPanel" class="row">
+                    <div class="col s12">
+                        <a id="btnAddDevice" class="btn waves-effect waves-light green">
+                            <i class="material-icons left">add</i>Agregar dispositivo
+                        </a>
+                        <a id="btnRefresh" class="btn waves-effect waves-light blue" style="margin-right: 10px;">
+                            <i class="material-icons left">refresh</i>Refrescar
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Panel para editar dispositivos -->
+            <div class="col s12 m12 l6 xl6" id="editPanel" style="display: none;">
+                <h4 id="deviceEditorTitle"></h4>
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="editName" type="text" class="validate">
+                        <label id="editNameLabel" for="editName">Nombre del Dispositivo</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="editDescription" type="text" class="validate">
+                        <label id="editDescriptionLabel" for="editDescription">Descripción del Dispositivo</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="editType" type="text" class="validate">
+                        <label id="editTypeLabel" for="editType">Tipo de Dispositivo</label>
+                    </div>
+                    <button id="saveDevice" class="btn waves-effect waves-light" type="button">Guardar</button>
+                    <button id="cancelDeviceChanges" class="btn waves-effect waves-light"
+                        type="button">Cancelar</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="">
+                    <ul id="list" class="">
+                        <!-- Aquí se llenará dinámicamente la lista de dispositivos -->
+                    </ul>
+                </div>
+
+            </div>
+
         </div>
-      </div>
     </main>
 
     <!-- Page Footer -->
     <footer class="page-footer" style="background-color:#124580">
-      <div class="container">
-        <div class="row">
-          <div class="col l6 s6">
-            <h5 class="white-text">Smart Home</h5>
-            <p class="grey-text text-lighten-4">Copyright ### - 2021</p>
-          </div>
-          <div class="col l6 s6">
-            <h5 class="white-text right-align">Contact</h5>
-            <p class="white-text right-align">
-              <a class="grey-text text-lighten-3" href="!#">Email | </a>
-              <a class="grey-text text-lighten-3" href="!#">Twitter | </a>
-              <a class="grey-text text-lighten-3" href="!#">LinkedIn</a>
-            </p>
-          </div>
-        </div>
-      </div>
     </footer>
 
-  </body>
+</body>
+
 </html>

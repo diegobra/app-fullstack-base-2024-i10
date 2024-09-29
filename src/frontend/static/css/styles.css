@@ -8,3 +8,36 @@ body {
 main {
     flex: 1 0 auto;
 }
+
+.card {
+    padding: 15px;
+    margin: 0 15px 20px 15px;
+}
+
+.card .card-title {
+    font-size: 18px;
+}
+
+.card-content p {
+font-size: 16px;
+    }
+
+input[type=range] {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.fixed-action-btn {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 999;
+  }
+  
+  .fixed-action-btn .btn-floating {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }

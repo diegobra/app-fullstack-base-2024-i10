@@ -4,22 +4,29 @@ class Main implements EventListenerObject {
 
     constructor() {
         
-        let btnBuscar = this.recuperarElemento("btnBuscar");
-        btnBuscar.addEventListener('click', this);
-        let btnAddDevice = this.recuperarElemento("btnAddDevice");
+        let btnRefresh = this.retrieveElement("btnRefresh");
+        btnRefresh.addEventListener('click', this);
+        let btnAddDevice = this.retrieveElement("btnAddDevice");
         btnAddDevice.addEventListener('click', this);
-        let btnSave = this.recuperarElemento("saveDevice");
+        let btnSave = this.retrieveElement("saveDevice");
         btnSave.addEventListener('click', this);
+        let btnCancelChanges = this.retrieveElement("cancelDeviceChanges");
+        btnCancelChanges.addEventListener('click', this);
+
+        this.refreshDevices();
+
     }
     handleEvent(object: Event): void {
-        let idDelElemento = (<HTMLElement>object.target).id;
-        if (idDelElemento === 'btnBuscar') {
-            this.buscarDevices();
-        } else if (idDelElemento === 'saveDevice') {
-            this.guardarCambios();
-        } else if (idDelElemento === 'btnAddDevice') {
+        let elementId = (<HTMLElement>object.target).id;
+        if (elementId === 'btnRefresh') {
+            this.refreshDevices();
+        } else if (elementId === 'saveDevice') {
+            this.saveDevice();
+        } else if (elementId === 'cancelDeviceChanges') {
+            this.hideDeviceEditPanel();
+        } else if (elementId === 'btnAddDevice') {
             // Se abre el panel de ABM en modo alta (se le pasa índice -1)
-            this.mostrarPanelABM(-1);
+            this.showDeviceEditPanel(-1);
 
             let xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = () => {
@@ -40,49 +47,66 @@ class Main implements EventListenerObject {
         
     }
 
-    private buscarDevices(): void {
+    private refreshDevices(): void {
         let xmlHttp = new XMLHttpRequest();
         
         xmlHttp.onreadystatechange = () => {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                let ul = this.recuperarElemento("list");
+                let ul = this.retrieveElement("list");
                 let listaDevices: string = '';
                 
                 this.dispositivos = JSON.parse(xmlHttp.responseText); // Guardamos los dispositivos
 
                 for (let index in this.dispositivos) {
                     let item = this.dispositivos[index];
-                    listaDevices += `
-                    <li class="collection-item avatar">
-                        <img src="./static/images/lightbulb.png" alt="" class="circle">
-                        <span class="title">${item.name}</span>
-                        <p>${item.description}</p>
-                        <a href="#!" class="secondary-content">
-                          <div class="switch">
-                              <label>
-                                Off`;
-                    if (item.state) {
-                        listaDevices += '<input type="checkbox" checked>';
-                    } else {
-                        listaDevices += '<input type="checkbox">';
-                    }
-                    listaDevices += `      
-                                <span class="lever"></span>
-                                On
-                              </label>
-                            </div>
-                          <i class="material-icons edit-device" data-index="${index}">edit</i> 
-                      </a>
-                    </li>`;
+                    listaDevices += `<div class="card blue darken-2 white-text col s12 m6 l3">
+                                    <div class="card-content">
+                                        <span class="card-title">
+                                        <i class="material-icons left">ac_unit</i> 
+                                        ${item.name}
+                                        </span>
+                                        <p>${item.description}</p>
+                                        <p>
+                                        <input id="edit-device-state${index}" name="edit-device-state" data-index="${index}" type="range" min="0" max="1" step="0.1" value="${item.state}" id="deviceState">
+                                        </p>
+                                    </div>
+                                    <div class="card-action">
+                                        <a href="#" name='edit-device' class="white-text" data-index="${index}">EDITAR</a>
+                                        <a href="#" name='delete-device' class="white-text" data-index="${index}">ELIMINAR</a>
+                                    </div>
+                                    </div>`;
+
                 }
                 ul.innerHTML = listaDevices;
 
-                // Agregar eventos para los botones de editar
-                let editButtons = document.querySelectorAll('.edit-device');
+                // Se agregan eventos para los botones de editar
+                let editButtons = document.getElementsByName('edit-device');
                 editButtons.forEach(button => {
                     button.addEventListener('click', (event: Event) => {
                         let index = (<HTMLElement>event.target).getAttribute('data-index');
-                        this.mostrarPanelABM(parseInt(index));
+                        this.showDeviceEditPanel(parseInt(index));
+                    });
+                });
+
+                // Se agregan eventos para los editores de estado
+                let stateEditButtons = document.getElementsByName('edit-device-state');
+                stateEditButtons.forEach(button => {
+                    button.addEventListener('click', (event: Event) => {
+                        let index = (<HTMLElement>event.target).getAttribute('data-index');
+                        this.editDeviceState(parseInt(index));
+                    });
+                });
+
+                // Se agregan eventos para los botones de editar
+                let deleteButtons = document.getElementsByName('delete-device');
+                deleteButtons.forEach(button => {
+                    button.addEventListener('input', (event: Event) => {
+                        let index = (<HTMLElement>event.target).getAttribute('data-index');
+
+                        if (confirm('¿Confirma eliminar el dispositivo?')) {
+                            this.deleteDevice(parseInt(index));
+                        }
+                        
                     });
                 });
             } else if (xmlHttp.readyState == 4) {
@@ -94,69 +118,88 @@ class Main implements EventListenerObject {
         xmlHttp.send();
     }
 
-    private mostrarPanelABM(index: number): void {
+    private showDeviceEditPanel(index: number): void {
 
         if (index >= 0) {
             let dispositivo = this.dispositivos[index];
 
-            this.recuperarElemento("deviceEditorTitle").innerText = "Editar dispositvo";
+            this.retrieveElement("deviceEditorTitle").innerText = "Editar dispositvo";
 
             // Rellenar los campos del panel con los datos del dispositivo
-            this.recuperarElemento("editName").value = dispositivo.name;
-            this.recuperarElemento("editDescription").value = dispositivo.description;
-            this.recuperarElemento("editType").value = dispositivo.type.toString();
-            this.recuperarElemento("editState").value = dispositivo.state.toString();
+            this.retrieveElement("editName").value = dispositivo.name;
+            this.retrieveElement("editDescription").value = dispositivo.description;
+            this.retrieveElement("editType").value = dispositivo.type.toString();
 
-            this.recuperarElemento("editNameLabel").setAttribute("class", "active");
-            this.recuperarElemento("editDescriptionLabel").setAttribute("class", "active");
-            this.recuperarElemento("editTypeLabel").setAttribute("class", "active");
-            this.recuperarElemento("editStateLabel").setAttribute("class", "active");
+            this.retrieveElement("editNameLabel").setAttribute("class", "active");
+            this.retrieveElement("editDescriptionLabel").setAttribute("class", "active");
+            this.retrieveElement("editTypeLabel").setAttribute("class", "active");
 
         } else { // No se recibe dispositivo, es un alta
 
-            this.recuperarElemento("deviceEditorTitle").innerText = "Agregar dispositvo";
+            this.retrieveElement("deviceEditorTitle").innerText = "Agregar dispositvo";
 
-            this.recuperarElemento("editNameLabel").setAttribute("class", "");
-            this.recuperarElemento("editDescriptionLabel").setAttribute("class", "");
-            this.recuperarElemento("editTypeLabel").setAttribute("class", "");
-            this.recuperarElemento("editStateLabel").setAttribute("class", "");
+            this.retrieveElement("editNameLabel").setAttribute("class", "");
+            this.retrieveElement("editDescriptionLabel").setAttribute("class", "");
+            this.retrieveElement("editTypeLabel").setAttribute("class", "");
         }
         // Mostrar el panel de edición
         let panel = document.getElementById("editPanel");
         if (panel) {
             panel.style.display = "block";
         }
+
+        this.hideActionPanel();
+
     }
 
-    private ocultarPanelEdicion(): void {
-        this.recuperarElemento("editName").value = "";
-        this.recuperarElemento("editDescription").value = "";
-        this.recuperarElemento("editType").value = "";
-        this.recuperarElemento("editState").value = "";
+    private deleteDevice(index: number):void {
+        console.log('Se elimina device ' + index);
+
+        this.refreshDevices();
+    }
+
+    private hideDeviceEditPanel(): void {
+        this.retrieveElement("editName").value = "";
+        this.retrieveElement("editDescription").value = "";
+        this.retrieveElement("editType").value = "";
 
         let panel = document.getElementById("editPanel");
         if (panel) {
             panel.style.display = "none";
         }
+
+        this.showActionPanel();
     }
 
-    private guardarCambios(): void {
-        let name = this.recuperarElemento("editName").value;
-        let description = this.recuperarElemento("editDescription").value;
-        let type = this.recuperarElemento("editType").value;
-        let state = parseFloat(this.recuperarElemento("editState").value);
+    private hideActionPanel(): void {
+        this.retrieveElement("actionPanel").style.display = "none"
+    }
+
+    private showActionPanel(): void {
+        this.retrieveElement("actionPanel").style.display = "block"
+    }
+
+    private saveDevice(): void {
+        let name = this.retrieveElement("editName").value;
+        let description = this.retrieveElement("editDescription").value;
+        let type = this.retrieveElement("editType").value;
 
         // Aquí puedes implementar la lógica para guardar los cambios (por ejemplo, hacer un PUT/POST)
-        console.log(`Guardando cambios: ${name}, ${description}, ${type}, ${state}`);
+        console.log(`Guardando cambios: ${name}, ${description}, ${type}`);
 
-        this.ocultarPanelEdicion();
+        this.hideDeviceEditPanel();
 
-        this.buscarDevices();
+        this.refreshDevices();
+    }
+
+    private editDeviceState(index: number): void {
+        let stateValue :number = parseFloat(this.retrieveElement(`edit-device-state${index}`).value)
+        console.log('edita el estado del dispotivo ' + index + ' con el valor ' + stateValue);
+        this.refreshDevices();
     }
     
-    
 
-    private recuperarElemento(id: string):HTMLInputElement {
+    private retrieveElement(id: string):HTMLInputElement {
         return <HTMLInputElement>document.getElementById(id);
     }
 }
