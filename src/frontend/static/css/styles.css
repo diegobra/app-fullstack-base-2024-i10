@@ -9,10 +9,10 @@ main {
     flex: 1 0 auto;
 }
 
-.card {
+/*.card {
     padding: 15px;
     margin: 0 15px 20px 15px;
-}
+}*/
 
 .card .card-title {
     font-size: 18px;

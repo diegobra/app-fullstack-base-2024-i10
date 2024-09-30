@@ -37,6 +37,13 @@ app.get('/devices/', function(req, res, next) {
             'state': 1, 
             'type': 2, 
         },
+        { 
+            'id': 4, 
+            'name': 'Aire acondicionado', 
+            'description': 'Aire acondicionado del living', 
+            'state': 1, 
+            'type': 2, 
+        },
     ]
     res.send(JSON.stringify(devices)).status(200);
 });

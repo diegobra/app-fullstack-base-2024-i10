@@ -1,6 +1,6 @@
 class Main implements EventListenerObject {
 
-    private dispositivos: Array<Device> = []; // Almacena los dispositivos cargados
+    private devices: Array<Device> = []; // Almacena los dispositivos cargados
 
     constructor() {
         
@@ -53,13 +53,14 @@ class Main implements EventListenerObject {
         xmlHttp.onreadystatechange = () => {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 let ul = this.retrieveElement("list");
-                let listaDevices: string = '';
+                let devicesList: string = '';
                 
-                this.dispositivos = JSON.parse(xmlHttp.responseText); // Guardamos los dispositivos
+                this.devices = JSON.parse(xmlHttp.responseText); // Guardamos los dispositivos
 
-                for (let index in this.dispositivos) {
-                    let item = this.dispositivos[index];
-                    listaDevices += `<div class="card blue darken-2 white-text col s12 m6 l3">
+                for (let index in this.devices) {
+                    let item = this.devices[index];
+                    devicesList += `<div class="col s12 m6 l3 xl3">
+                                    <div class="card blue darken-2 white-text">
                                     <div class="card-content">
                                         <span class="card-title">
                                         <i class="material-icons left">ac_unit</i> 
@@ -74,10 +75,10 @@ class Main implements EventListenerObject {
                                         <a href="#" name='edit-device' class="white-text" data-index="${index}">EDITAR</a>
                                         <a href="#" name='delete-device' class="white-text" data-index="${index}">ELIMINAR</a>
                                     </div>
-                                    </div>`;
+                                    </div></div>`;
 
                 }
-                ul.innerHTML = listaDevices;
+                ul.innerHTML = devicesList;
 
                 // Se agregan eventos para los botones de editar
                 let editButtons = document.getElementsByName('edit-device');
@@ -121,7 +122,7 @@ class Main implements EventListenerObject {
     private showDeviceEditPanel(index: number): void {
 
         if (index >= 0) {
-            let dispositivo = this.dispositivos[index];
+            let dispositivo = this.devices[index];
 
             this.retrieveElement("deviceEditorTitle").innerText = "Editar dispositvo";
 
@@ -180,16 +181,22 @@ class Main implements EventListenerObject {
     }
 
     private saveDevice(): void {
-        let name = this.retrieveElement("editName").value;
-        let description = this.retrieveElement("editDescription").value;
-        let type = this.retrieveElement("editType").value;
+        let deviceName = this.retrieveElement("editName").value;
+        let deviceDescription = this.retrieveElement("editDescription").value;
+        let deviceType = this.retrieveElement("editType").value;
 
-        // Aquí puedes implementar la lógica para guardar los cambios (por ejemplo, hacer un PUT/POST)
-        console.log(`Guardando cambios: ${name}, ${description}, ${type}`);
+        if (!deviceName || !deviceDescription || !deviceType || deviceType === '0')
+            alert('No se han ingresado todos los datos.')
+        else {
 
-        this.hideDeviceEditPanel();
+            // Aquí puedes implementar la lógica para guardar los cambios (por ejemplo, hacer un PUT/POST)
+            console.log(`Guardando cambios: ${deviceName}, ${deviceDescription}, ${deviceType}`);
 
-        this.refreshDevices();
+            this.hideDeviceEditPanel();
+
+            this.refreshDevices();
+
+        }
     }
 
     private editDeviceState(index: number): void {
@@ -207,4 +214,15 @@ window.addEventListener('load', () => {
     
     let main: Main = new Main();
     
+});
+
+
+
+// Materialize
+
+declare const M: any;
+
+document.addEventListener('DOMContentLoaded', function() {
+     var elems = document.querySelectorAll('select');
+     M.FormSelect.init(elems);
 });
