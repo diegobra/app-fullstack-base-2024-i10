@@ -3,7 +3,7 @@ class Main implements EventListenerObject {
     private devices: Array<Device> = []; // Almacena los dispositivos cargados
 
     constructor() {
-        
+
         let btnRefresh = this.retrieveElement("btnRefresh");
         btnRefresh.addEventListener('click', this);
         let btnAddDevice = this.retrieveElement("btnAddDevice");
@@ -18,6 +18,8 @@ class Main implements EventListenerObject {
     }
     handleEvent(object: Event): void {
         let elementId = (<HTMLElement>object.target).id;
+        let elementName = (<HTMLInputElement>object.target).name;
+
         if (elementId === 'btnRefresh') {
             this.refreshDevices();
         } else if (elementId === 'saveDevice') {
@@ -34,27 +36,43 @@ class Main implements EventListenerObject {
                     console.log("se ejecuto el post", xmlHttp.responseText);
                 }
             }
-           
-            xmlHttp.open("POST", "http://localhost:8000/usuario", true);
-            
-            xmlHttp.setRequestHeader("Content-Type", "application/json"); 
-            xmlHttp.setRequestHeader("otracosa", "algo"); 
-            
 
-            let json = {name: 'mramos' };
+            xmlHttp.open("POST", "http://localhost:8000/usuario", true);
+
+            xmlHttp.setRequestHeader("Content-Type", "application/json");
+            xmlHttp.setRequestHeader("otracosa", "algo");
+
+
+            let json = { name: 'mramos' };
             xmlHttp.send(JSON.stringify(json));
+
+        } else if (elementName === "edit-device-state") {
+            let deviceElem = <HTMLInputElement>object.target;
+            let deviceId = deviceElem.getAttribute("device-id-bd");
+            let deviceValue = deviceElem.value;
+
+            console.log(deviceId);
+            console.log(deviceValue);
+
+        } else if (elementId.startsWith('editDevicfdseState_')) {
+            let deviceElem = <HTMLInputElement>object.target;
+            let deviceId = deviceElem.getAttribute("device-id-bd");
+            let deviceValue = deviceElem.value;
+
+            console.log(deviceId);
+            console.log(deviceValue);
         }
-        
+
     }
 
     private refreshDevices(): void {
         let xmlHttp = new XMLHttpRequest();
-        
+
         xmlHttp.onreadystatechange = () => {
             if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                 let ul = this.retrieveElement("list");
                 let devicesList: string = '';
-                
+
                 this.devices = JSON.parse(xmlHttp.responseText); // Guardamos los dispositivos
 
                 for (let index in this.devices) {
@@ -63,12 +81,12 @@ class Main implements EventListenerObject {
                                     <div class="card blue darken-2 white-text">
                                     <div class="card-content">
                                         <span class="card-title">
-                                        <i class="material-icons left">ac_unit</i> 
-                                        ${item.name}
+                                            <i class="material-icons left">ac_unit</i> 
+                                            ${item.name}
                                         </span>
                                         <p>${item.description}</p>
                                         <p>
-                                        <input id="edit-device-state${index}" name="edit-device-state" data-index="${index}" type="range" min="0" max="1" step="0.1" value="${item.state}" id="deviceState">
+                                            <input id="editDeviceState_${index}" device-id-bd="${item.id}" name="edit-device-state" data-index="${index}" type="range" min="0" max="1" step="0.1" value="${item.state}" id="deviceState">
                                         </p>
                                     </div>
                                     <div class="card-action">
@@ -83,19 +101,21 @@ class Main implements EventListenerObject {
                 // Se agregan eventos para los botones de editar
                 let editButtons = document.getElementsByName('edit-device');
                 editButtons.forEach(button => {
-                    button.addEventListener('click', (event: Event) => {
+                    button.addEventListener('click', this);
+                    /*button.addEventListener('click', (event: Event) => {
                         let index = (<HTMLElement>event.target).getAttribute('data-index');
                         this.showDeviceEditPanel(parseInt(index));
-                    });
+                    });*/
                 });
 
                 // Se agregan eventos para los editores de estado
                 let stateEditButtons = document.getElementsByName('edit-device-state');
                 stateEditButtons.forEach(button => {
-                    button.addEventListener('click', (event: Event) => {
+                    button.addEventListener('click', this);
+                    /*button.addEventListener('click', (event: Event) => {
                         let index = (<HTMLElement>event.target).getAttribute('data-index');
                         this.editDeviceState(parseInt(index));
-                    });
+                    });*/
                 });
 
                 // Se agregan eventos para los botones de editar
@@ -107,7 +127,7 @@ class Main implements EventListenerObject {
                         if (confirm('¿Confirma eliminar el dispositivo?')) {
                             this.deleteDevice(parseInt(index));
                         }
-                        
+
                     });
                 });
             } else if (xmlHttp.readyState == 4) {
@@ -133,7 +153,6 @@ class Main implements EventListenerObject {
 
             this.retrieveElement("editNameLabel").setAttribute("class", "active");
             this.retrieveElement("editDescriptionLabel").setAttribute("class", "active");
-            this.retrieveElement("editTypeLabel").setAttribute("class", "active");
 
         } else { // No se recibe dispositivo, es un alta
 
@@ -141,7 +160,6 @@ class Main implements EventListenerObject {
 
             this.retrieveElement("editNameLabel").setAttribute("class", "");
             this.retrieveElement("editDescriptionLabel").setAttribute("class", "");
-            this.retrieveElement("editTypeLabel").setAttribute("class", "");
         }
         // Mostrar el panel de edición
         let panel = document.getElementById("editPanel");
@@ -153,7 +171,7 @@ class Main implements EventListenerObject {
 
     }
 
-    private deleteDevice(index: number):void {
+    private deleteDevice(index: number): void {
         console.log('Se elimina device ' + index);
 
         this.refreshDevices();
@@ -200,29 +218,31 @@ class Main implements EventListenerObject {
     }
 
     private editDeviceState(index: number): void {
-        let stateValue :number = parseFloat(this.retrieveElement(`edit-device-state${index}`).value)
+        let stateValue: number = parseFloat(this.retrieveElement(`edit-device-state${index}`).value)
         console.log('edita el estado del dispotivo ' + index + ' con el valor ' + stateValue);
         this.refreshDevices();
     }
-    
 
-    private retrieveElement(id: string):HTMLInputElement {
+
+    private retrieveElement(id: string): HTMLInputElement {
         return <HTMLInputElement>document.getElementById(id);
     }
 }
 window.addEventListener('load', () => {
-    
+
     let main: Main = new Main();
-    
+
 });
 
 
 
 // Materialize
 
+// Se agrega esta declaración para que TS no devuelva error.
 declare const M: any;
 
-document.addEventListener('DOMContentLoaded', function() {
-     var elems = document.querySelectorAll('select');
-     M.FormSelect.init(elems);
+// JS para que funcione el elemento select de Materialize
+document.addEventListener('DOMContentLoaded', function () {
+    var elems = document.querySelectorAll('select');
+    M.FormSelect.init(elems);
 });
