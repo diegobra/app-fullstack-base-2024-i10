@@ -69,7 +69,10 @@ INSERT INTO `Devices` (`id`, `name`, `description`, `state`, `typeId`) VALUES
 INSERT INTO `DevicesTypes` (`id`, `name`, `icon_name`) VALUES
 (1, 'Lámpara', 'lightbulb_outline'),
 (2, 'Persiana', 'grid_on'),
-(3, 'Aire acondicionado', 'ac_unit');
+(3, 'Aire acondicionado', 'ac_unit'),
+(4, 'TV', 'tv'),
+(5, 'Ventilador', 'slow_motion_video'),
+(6, 'Enchufe', 'power');
 
 --
 -- Indexes for dumped tables
@@ -102,7 +105,7 @@ COMMIT;
 -- AUTO_INCREMENT for table `DevicesTypes`
 --
 ALTER TABLE `DevicesTypes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 

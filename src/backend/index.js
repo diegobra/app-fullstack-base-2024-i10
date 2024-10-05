@@ -15,7 +15,11 @@ app.use(express.static('/home/node/app/static/'));
 
 // Obtener un dispositivo por ID
 app.get('/device/:id', function(req, res) {
-    utils.query(`SELECT id, description FROM Devices WHERE id=${req.params.id}`, (error, respuesta, fields) => {
+    let deviceId = parseInt(req.params.id, 10);
+    if (isNaN(deviceId)) {
+        return res.status(400).send({ error: 'Invalid device ID' });
+    }
+    utils.query('SELECT id, description FROM Devices WHERE id = ?', [deviceId], (error, respuesta, fields) => {
         if (error) {
             res.status(409).send(error.sqlMessage);
         } else {
@@ -28,7 +32,7 @@ app.get('/device/:id', function(req, res) {
 app.get('/devices/', function(req, res) {
     utils.query('SELECT * FROM Devices', (error, devices, fields) => {
         if (error) {
-            res.status(500).send('este es el error: '  + error.sqlMessage);
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(200).json(devices);
         }
@@ -38,9 +42,15 @@ app.get('/devices/', function(req, res) {
 // Agregar un nuevo dispositivo
 app.post('/device/', function(req, res) {
     let { name, description, typeId } = req.body;
-    utils.query(`INSERT INTO Devices (name, description, state, typeId) VALUES ('${name}', '${description}', 0.0, ${typeId})`, (error, result) => {
+    
+    if (!name || !description || isNaN(typeId)) {
+        return res.status(400).send({ error: 'Missing or invalid parameters' });
+    }
+
+    utils.query('INSERT INTO Devices (name, description, state, typeId) VALUES (?, ?, ?, ?)', 
+    [name, description, 0.0, typeId], (error, result) => {
         if (error) {
-            res.status(500).send(error.sqlMessage);
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(201).send({ message: 'Device added successfully', id: result.insertId });
         }
@@ -49,10 +59,17 @@ app.post('/device/', function(req, res) {
 
 // Actualizar un dispositivo existente
 app.put('/device/:id', function(req, res) {
-    let { name, description, state, typeId } = req.body;
-    utils.query(`UPDATE Devices SET name='${name}', description='${description}', state=${state}, typeId=${typeId} WHERE id=${req.params.id}`, (error, result) => {
+    let deviceId = parseInt(req.params.id, 10);
+    let { name, description, typeId } = req.body;
+
+    if (isNaN(deviceId) || !name || !description || isNaN(typeId)) {
+        return res.status(400).send({ error: 'Invalid or missing parameters' });
+    }
+
+    utils.query('UPDATE Devices SET name = ?, description = ?, typeId = ? WHERE id = ?', 
+    [name, description, typeId, deviceId], (error, result) => {
         if (error) {
-            res.status(500).send(error.sqlMessage);
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(200).send({ message: 'Device updated successfully' });
         }
@@ -61,11 +78,16 @@ app.put('/device/:id', function(req, res) {
 
 // Actualizar el estado (state) de un dispositivo
 app.patch('/device/:id/state', function(req, res) {
+    let deviceId = parseInt(req.params.id, 10);
     let { state } = req.body;
-    console.log('estado recibido: '+ state);
-    utils.query(`UPDATE Devices SET state=${state} WHERE id=${req.params.id}`, (error, result) => {
+
+    if (isNaN(deviceId) || isNaN(state) || state < 0 || state > 1) {
+        return res.status(400).send({ error: 'Invalid or missing parameters' });
+    }
+
+    utils.query('UPDATE Devices SET state = ? WHERE id = ?', [state, deviceId], (error, result) => {
         if (error) {
-            res.status(500).send(error.sqlMessage);
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(200).send({ message: 'Device state updated successfully' });
         }
@@ -74,11 +96,28 @@ app.patch('/device/:id/state', function(req, res) {
 
 // Eliminar un dispositivo
 app.delete('/device/:id', function(req, res) {
-    utils.query(`DELETE FROM Devices WHERE id=${req.params.id}`, (error, result) => {
+    let deviceId = parseInt(req.params.id, 10);
+
+    if (isNaN(deviceId)) {
+        return res.status(400).send({ error: 'Invalid device ID' });
+    }
+
+    utils.query('DELETE FROM Devices WHERE id = ?', [deviceId], (error, result) => {
         if (error) {
-            res.status(500).send(error.sqlMessage);
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(200).send({ message: 'Device deleted successfully' });
+        }
+    });
+});
+
+// Obtener tipos de dispositivos
+app.get('/deviceTypes', function(req, res) {
+    utils.query('SELECT id, name, icon_name FROM DevicesTypes', (error, respuesta, fields) => {
+        if (error) {
+            res.status(409).send({ error: error.sqlMessage });
+        } else {
+            res.status(200).send(respuesta);
         }
     });
 });
