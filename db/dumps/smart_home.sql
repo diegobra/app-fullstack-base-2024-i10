@@ -47,7 +47,7 @@ CREATE TABLE `Devices` (
 CREATE TABLE `DevicesTypes` (
   `id` int(11) NOT NULL,
   `name` varchar(64) NOT NULL,
-  `icon_name` varchar(100) NOT NULL,
+  `icon_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
