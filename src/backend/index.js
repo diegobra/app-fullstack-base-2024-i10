@@ -100,7 +100,7 @@ app.delete('/device/:id', function(req, res) {
 app.get('/deviceTypes', function(req, res) {
     utils.query('SELECT id, name, icon_name FROM DevicesTypes', (error, respuesta, fields) => {
         if (error) {
-            res.status(409).send({ error: error.sqlMessage });
+            res.status(500).send({ error: error.sqlMessage });
         } else {
             res.status(200).send(respuesta);
         }

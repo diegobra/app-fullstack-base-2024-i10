@@ -208,33 +208,13 @@ El backend de la aplicación está construido con **Node.js** y utiliza **Expres
 
 <details><summary><b>Ver los endpoints disponibles</b></summary><br>
 
-Completá todos los endpoints del backend con los metodos disponibles, los headers y body que recibe, lo que devuelve, ejemplos, etc.
-
-1) Devolver el estado de los dispositivos.
-
-```json
-{
-    "method": "get",
-    "request_headers": "application/json",
-    "request_body": "",
-    "response_code": 200,
-    "request_body": {
-        "devices": [
-            {
-                "id": 1,
-                "status": true,
-                "description": "Kitchen light"
-            }
-        ]
-    },
-}
-``` 
 1) Obtener todos los dispositivos.
 
 ```json
 {
     "method": "GET",
     "endpoint": "/devices",
+    "description": "Obtiene la lista de todos los dispositivos.",
     "request_headers": {
         "Content-Type": "application/json"
     },
@@ -243,21 +223,267 @@ Completá todos los endpoints del backend con los metodos disponibles, los heade
     "response_body": [
         {
             "id": 1,
-            "name": "Lampara 11",
-            "description": "Luz living",
-            "state": 1,
-            "typeId": 1
+            "name": "Luz sala",
+            "description": "Luz de la sala de estar",
+            "state": 0.8,
+            "typeId": 2
         },
         {
-            "id": 3,
-            "name": "Velador",
-            "description": "Velador living",
-            "state": 1,
+            "id": 2,
+            "name": "Cortina dormitorio",
+            "description": "Cortina del dormitorio",
+            "state": 0.5,
+            "typeId": 1
+        }
+    ],
+    "response_code_error": 500,
+    "response_body_error": {
+        "error": "Database error message"
+    },
+    "example": {
+        "request": "GET /devices",
+        "response": [
+            {
+              "id": 1,
+              "name": "Luz sala",
+              "description": "Luz de la sala de estar",
+              "state": 0.8,
+              "typeId": 1
+          },
+          {
+              "id": 2,
+              "name": "Cortina dormitorio",
+              "description": "Cortina del dormitorio",
+              "state": 0.5,
+              "typeId": 2
+          }
+        ]
+    }
+}
+```
+
+2) Agregar un nuevo dispositivo
+
+```json
+{
+    "method": "POST",
+    "endpoint": "/device",
+    "description": "Agrega un nuevo dispositivo a la base de datos.",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": {
+        "name": "Luz del baño",
+        "description": "Luz del baño principal",
+        "typeId": 1
+    },
+    "response_code": 201,
+    "response_body": {
+        "message": "Device added successfully",
+        "id": 3
+    },
+    "response_code_errors": [
+        {
+            "response_code": 400,
+            "response_body": {
+                "error": "Missing or invalid parameters"
+            }
+        },
+        {
+            "response_code": 500,
+            "response_body": {
+                "error": "Internal server error"
+            }
+        }
+    ],
+    "example": {
+        "request": "POST /device",
+        "body": {
+            "name": "Luz del baño",
+            "description": "Luz del baño principal",
             "typeId": 1
         },
-    ],
+        "response": {
+            "message": "Device added successfully",
+            "id": 3
+        }
+    }
 }
-``` 
+```
+
+3) Actualizar un dispositivo existente
+
+```json
+{
+    "method": "PUT",
+    "endpoint": "/device/:id",
+    "description": "Actualiza los detalles de un dispositivo específico por su ID.",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": {
+        "name": "Nombre de dispositivo actualizado",
+        "description": "Descripción actualizada",
+        "typeId": 1
+    },
+    "response_code": 200,
+    "response_body": {
+        "message": "Device updated successfully"
+    },
+    "response_code_errors": [
+        {
+            "response_code": 400,
+            "response_body": {
+                "error": "Missing or invalid parameters"
+            }
+        },
+        {
+            "response_code": 500,
+            "response_body": {
+                "error": "Internal server error"
+            }
+        }
+    ],
+    "example": {
+        "request": "PUT /device/1",
+        "body": {
+            "name": "Nombre de dispositivo actualizado",
+            "description": "Descripción actualizada",
+            "typeId": 1
+        },
+        "response": {
+            "message": "Device updated successfully"
+        }
+    }
+}
+```
+
+4) Actualizar el estado de un dispositivo
+
+```json
+{
+    "method": "PATCH",
+    "endpoint": "/device/:id/state",
+    "description": "Actualiza el estado de un dispositivo específico.",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": {
+        "state": 0.9
+    },
+    "response_code": 200,
+    "response_body": {
+        "message": "Device state updated successfully"
+    },
+    "response_code_errors": [
+        {
+            "response_code": 400,
+            "response_body": {
+                "error": "Missing or invalid parameters"
+            }
+        },
+        {
+            "response_code": 500,
+            "response_body": {
+                "error": "Internal server error"
+            }
+        }
+    ],
+    "example": {
+        "request": "PATCH /device/1/state",
+        "body": {
+            "state": 0.9
+        },
+        "response": {
+            "message": "Device state updated successfully"
+        }
+    }
+}
+```
+
+5) Eliminar un dispositivo
+
+```json
+{
+    "method": "DELETE",
+    "endpoint": "/device/:id",
+    "description": "Elimina un dispositivo específico por su ID.",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": "",
+    "response_code": 200,
+    "response_body": {
+        "message": "Device deleted successfully"
+    },
+    "response_code_errors": [
+        {
+            "response_code": 400,
+            "response_body": {
+                "error": "Missing or invalid parameters"
+            }
+        },
+        {
+            "response_code": 500,
+            "response_body": {
+                "error": "Internal server error"
+            }
+        }
+    ],
+    "example": {
+        "request": "DELETE /device/1",
+        "response": {
+            "message": "Device deleted successfully"
+        }
+    }
+}
+```
+
+6) Obtener tipos de dispositivos
+
+```json
+{
+    "method": "GET",
+    "endpoint": "/deviceTypes",
+    "description": "Obtiene la lista de todos los tipos de dispositivos disponibles.",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": "",
+    "response_code": 200,
+    "response_body": [
+        {
+            "id": 1,
+            "name": "Lámpara",
+            "icon_name": "lightbulb_outline"
+        },
+        {
+            "id": 2,
+            "name": "Persiana",
+            "icon_name": "grid_on"
+        }
+    ],
+    "response_code_error": 500,
+    "response_body_error": {
+        "error": "Database error message"
+    },
+    "example": {
+        "request": "GET /deviceTypes",
+        "response": [
+                {
+                "id": 1,
+                "name": "Lámpara",
+                "icon_name": "lightbulb_outline"
+            },
+            {
+                "id": 2,
+                "name": "Persiana",
+                "icon_name": "grid_on"
+            }
+        ]
+    }
+}
+```
 
 </details>
 
