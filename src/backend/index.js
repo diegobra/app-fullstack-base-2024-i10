@@ -13,21 +13,6 @@ app.use(express.static('/home/node/app/static/'));
 
 //=======[ Main module code ]==================================================
 
-// Obtener un dispositivo por ID
-app.get('/device/:id', function(req, res) {
-    let deviceId = parseInt(req.params.id, 10);
-    if (isNaN(deviceId)) {
-        return res.status(400).send({ error: 'Invalid device ID' });
-    }
-    utils.query('SELECT id, description FROM Devices WHERE id = ?', [deviceId], (error, respuesta, fields) => {
-        if (error) {
-            res.status(409).send(error.sqlMessage);
-        } else {
-            res.status(200).send(respuesta);
-        }
-    });
-});
-
 // Obtener todos los dispositivos
 app.get('/devices/', function(req, res) {
     utils.query('SELECT * FROM Devices', (error, devices, fields) => {

@@ -15,7 +15,7 @@ Realizando estas tareas vas a a tener una aplicación fullstack IoT del mundo re
 
 En esta imagen podés ver una posible implementación del cliente web que controla los artefactos del hogar.
 
-![architecture](doc/webapp-example-1.png)
+![architecture](doc/webapp.png)
 
 ## Comenzando 🚀
 
@@ -158,15 +158,53 @@ En esta sección podés ver los detalles específicos de funcionamiento del cód
 
 ### Agregar un dispositivo
 
-Completá los pasos para agregar un dispositivo desde el cliente web.
+Para agregar un dispositivo debes seguir los siguientes pasos:
+1 - Presionar el botón `AGREGAR DISPOSITIVO`.
+2 - En el panel que se despliega completa los datos del mismo: `Nombre del Dispositivo`, `Descripción del Dispositivo` y seleccionar un tipo en el combo `Tipo de Dispositivo`.
+3 - Cuando hayas terminado presiona el botón `Guardar` o `Cancelar` para volver atrás.
 
-### Frontend
+### Editar o eliminar un dispositivo
 
-Completá todos los detalles sobre cómo armaste el frontend, sus interacciones, etc.
+Para editar o eliminar un dispositivo simplemente debes presionar los botones `EDITAR` o `ELIMINAR` situados en la parte inferior de cada card. Al momento de editar se mostrará un diálogo similar al de alta de dispositivo para que hagas las modificaciones necesarias.
 
-### Backend
+## Frontend
 
-Completá todos los detalles de funcionamiento sobre el backend, sus interacciones con el cliente web, la base de datos, etc.
+El frontend de esta aplicación está desarrollado en **TypeScript** y utiliza la librería **Materialize** para la interfaz de usuario. La aplicación está estructurada como una **Single Page Application (SPA)**, lo que significa que las interacciones con el servidor se manejan de forma dinámica sin necesidad de recargar la página en su totalidad.
+
+### Estructura
+
+- **Interfaz de Usuario**: La UI está construida usando Materialize, que proporciona componentes visuales como formularios, cards y sliders para un diseño responsive. La aplicación es compatible con navegadores de escritorio y está diseñada para que funcione de forma agradable también en dispositivos móviles.
+- **Eventos**: 
+  - Se gestionan mediante una clase principal (`Main`) que implementa el patrón `EventListenerObject`, centralizando la lógica de los mismos.
+  - Los eventos se capturan a través de `addEventListener` y se manejan en el método `handleEvent`. Esto incluye la actualización de estados de dispositivos, la creación de nuevos dispositivos, la edición de dispositivos existentes y la eliminación de dispositivos.
+- **Comunicación con el Backend**: 
+  - La aplicación utiliza `XMLHttpRequest` para enviar y recibir datos desde el servidor. Las solicitudes son principalmente de los siguientes tipos:
+    - **GET**: Para obtener listas de dispositivos y tipos de dispositivos.
+    - **POST**: Para crear nuevos dispositivos.
+    - **PUT**: Para actualizar los detalles de un dispositivo existente.
+    - **PATCH**: Para actualizar el estado de un dispositivo (actualización parcial).
+    - **DELETE**: Para eliminar dispositivos.
+  - La estructura de los datos intercambiados es en formato **JSON**, lo que permite una integración eficiente con el backend.
+
+### Funcionalidades Principales
+
+- **Lista de dispositivos**: Los dispositivos se muestran en una grilla de cards, donde cada una representa un dispositivo con sus datos (nombre, descripción, estado).
+- **Edición de dispositivos**: Al hacer clic en el botón "EDITAR" de un dispositivo, se despliega un panel para modificar sus atributos.
+- **Control de Estado**: Cada dispositivo que admite la regulación de estado tiene un slider que permite ajustar su valor entre 0 y 1, lo que se envía al backend para su actualización.
+- **Agregar y Eliminar Dispositivos**: Permite agregar nuevos dispositivos o eliminar los existentes con confirmación del usuario.
+
+## Backend
+
+El backend de la aplicación está construido con **Node.js** y utiliza **Express** para gestionar las rutas y las operaciones de la API RESTful. Se conecta a una base de datos **MySQL** para almacenar y recuperar la información de los dispositivos.
+
+### Estructura
+
+- **Servidor**: 
+  - El servidor se encuentra en `index.js`, donde se configuran las rutas y los middleware necesarios.
+  - Se utiliza **Express** para manejar las rutas que corresponden a las operaciones CRUD (Create, Read, Update, Delete) para los dispositivos.
+- **Base de Datos**:
+  - La base de datos **MySQL** almacena la información de los dispositivos y los tipos de los mismos.
+  - Las operaciones de la base de datos se manejan utilizando un cliente de MySQL (por ejemplo, `mysql2`) que permite realizar consultas SQL para las diferentes acciones de la API.
 
 <details><summary><b>Ver los endpoints disponibles</b></summary><br>
 
@@ -189,6 +227,35 @@ Completá todos los endpoints del backend con los metodos disponibles, los heade
             }
         ]
     },
+}
+``` 
+1) Obtener todos los dispositivos.
+
+```json
+{
+    "method": "GET",
+    "endpoint": "/devices",
+    "request_headers": {
+        "Content-Type": "application/json"
+    },
+    "request_body": "",
+    "response_code": 200,
+    "response_body": [
+        {
+            "id": 1,
+            "name": "Lampara 11",
+            "description": "Luz living",
+            "state": 1,
+            "typeId": 1
+        },
+        {
+            "id": 3,
+            "name": "Velador",
+            "description": "Velador living",
+            "state": 1,
+            "typeId": 1
+        },
+    ],
 }
 ``` 
 
